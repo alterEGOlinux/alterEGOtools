@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+## { alterEGO Linux: "Open the vault of knowledge" } ----------------------- ##
+##                                                                           ##
+## alterEGOtools/vmutils.py                                                  ##
+##   created        : 2021-10-18 21:10:53 UTC                                ##
+##   updated        : 2021-10-18 21:11:03 UTC                                ##
+##   description    : Virtual machines module                                ##
+## _________________________________________________________________________ ##
+
+import subprocess
+import shlex
+
+def is_vm():
+
+    #### Use `$ systemd-detect-virt`
+    #... If VirtualBox will return 'oracle'.
+    #... If not in VM, will return 'none'.
+
+    detect = subprocess.run(shlex.split(f"systemd-detect-virt"), stdout=subprocess.PIPE)
+
+    return detect.stdout
