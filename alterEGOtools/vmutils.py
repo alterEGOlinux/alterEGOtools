@@ -11,7 +11,7 @@
 import subprocess
 import shlex
 
-def is_vm():
+def detect_vm():
 
     #### Use `$ systemd-detect-virt`
     #... If VirtualBox will return 'oracle'.
@@ -21,4 +21,7 @@ def is_vm():
 
     result = detect.stdout.strip().decode('UTF-8')
 
-    return result
+    if result == 'none':
+        return (False, 'NOT_A_VIRTUAL_MACHINE')
+    else:
+        return (TRUE, result)
