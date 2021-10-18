@@ -19,4 +19,6 @@ def is_vm():
 
     detect = subprocess.run(shlex.split(f"systemd-detect-virt"), stdout=subprocess.PIPE)
 
-    return detect.stdout
+    result = detect.stdout.strip().decode('UTF-8')
+
+    return result
