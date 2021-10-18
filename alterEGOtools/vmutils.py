@@ -25,3 +25,16 @@ def detect_vm():
         return (False, 'NOT_A_VIRTUAL_MACHINE')
     else:
         return (True, result)
+
+def is_vm():
+    return detect_vm()[0]
+
+def which_wm():
+    vm = detect_vm()[1]
+
+    if vm == 'NOT_A_VIRTUAL_MACHINE':
+        return 'NOT_A_VIRTUAL_MACHINE'
+    elif vm == 'oracle':
+        return 'VIRTUALBOX'
+    elif vm == 'vmware':
+        return 'VMWARE'
