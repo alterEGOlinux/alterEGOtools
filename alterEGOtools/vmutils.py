@@ -24,4 +24,4 @@ def detect_vm():
     if result == 'none':
         return (False, 'NOT_A_VIRTUAL_MACHINE')
     else:
-        return (TRUE, result)
+        return (True, result)
