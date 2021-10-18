@@ -29,7 +29,7 @@ def detect_vm():
 def is_vm():
     return detect_vm()[0]
 
-def which_wm():
+def which_vm():
     vm = detect_vm()[1]
 
     if vm == 'NOT_A_VIRTUAL_MACHINE':
