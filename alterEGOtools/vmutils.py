@@ -34,3 +34,5 @@ def which_vm():
         return 'VIRTUALBOX'
     elif vm == 'vmware':
         return 'VMWARE'
+
+## FIN _____________________________________________________________ ¯\_(ツ)_/¯

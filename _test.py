@@ -1,9 +1,4 @@
-import alterEGOtools as aet
+import alterEGOtools.vmutils
 
-print(aet.vmutils.detect_vm())
-
-print(aet.vmutils.is_vm())
-
-print(aet.vmutils.which_vm())
-
-
+# alterEGOtools.sysutils.execute(f"bash ../test/count_to_100.bash")
+print(alterEGOtools.vmutils.is_vm())
