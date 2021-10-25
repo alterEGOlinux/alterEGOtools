@@ -8,6 +8,7 @@
 ##   description    : test file for alterEGOtools module                     ##
 ## _________________________________________________________________________ ##
 
-import .sysutils
+from .sysutils import execute
 
 sysutils.execute(f"bash ../test/count_to_100.bash")
+execute(f"echo *", shell=True)
