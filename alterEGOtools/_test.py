@@ -8,7 +8,11 @@
 ##   description    : test file for alterEGOtools module                     ##
 ## _________________________________________________________________________ ##
 
-from .sysutils import execute
+import sys
+from . import sysutils
 
-sysutils.execute(f"bash ../test/count_to_100.bash")
-execute(f"echo *", shell=True)
+if sys.argv[1] == "install":
+    sysutils.execute(f"bash ~/repositories/alterEGOlinux/alterEGOtools/test/count_to_100.bash", shell=True)
+else:
+    sys.exit()
+
