@@ -8,6 +8,6 @@
 ##   description    : test file for alterEGOtools module                     ##
 ## _________________________________________________________________________ ##
 
-from .alterEGOtools import sysutils
+import .sysutils
 
 sysutils.execute(f"bash ../test/count_to_100.bash")
