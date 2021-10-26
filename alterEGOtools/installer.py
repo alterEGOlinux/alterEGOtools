@@ -434,13 +434,12 @@ class Installer:
 
         
         sysutils.execute(f'arch-chroot /mnt pip install git+https://github.com/alterEGOlinux/alterEGOtools.git')
-        alterEGO_installer = '/lib/python3.9/site-packages/alterEGOtools/installer.py'
         if self.mode == 'minimal':
-            execute(f'arch-chroot /mnt python {alterEGO_installer} --sysconfig minimal')
+            execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig minimal')
         elif self.mode == 'niceguy':
-            execute(f'arch-chroot /mnt python {alterEGO_installer} --sysconfig niceguy')
+            execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig niceguy')
         elif self.mode == 'beast':
-            execute(f'arch-chroot /mnt python {alterEGO_installer} --sysconfig beast')
+            execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig beast')
 
     def pull_git(self):
 
