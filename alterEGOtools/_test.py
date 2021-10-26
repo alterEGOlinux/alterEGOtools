@@ -8,10 +8,16 @@
 ##   description    : test file for alterEGOtools module                     ##
 ## _________________________________________________________________________ ##
 
+import argparse
 import sys
 from . import sysutils
 
-if sys.argv[1] == "install":
+arg_parser = argparse.ArgumentParser(prog='_test.py', description='For testing purpose.')
+arg_parser.add_argument('--install', help='mode')
+
+args = arg_parser.parse_args()
+
+if args.install:
     sysutils.execute(f"bash ~/repositories/alterEGOlinux/alterEGOtools/test/count_to_100.bash", shell=True)
 else:
     sys.exit()

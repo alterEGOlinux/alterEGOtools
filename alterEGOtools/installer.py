@@ -21,6 +21,8 @@ import sys
 import threading
 import time
 
+from . import sysutils
+
 ## [ GLOBAL VARIABLES ] ---------------------------------------------------- ##
 
 gitTOOLS = 'https://github.com/fantomH/alterEGOtools.git'
@@ -420,15 +422,25 @@ class Installer:
 
     def chroot(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Preparing arch-root...", wait=2)
-        shutil.copy('/root/ego.py', '/mnt/root/ego.py')
+        # shutil.copy('/root/ego.py', '/mnt/root/ego.py')
 
         #### Moves to chroot to configure the new system.
+        # if self.mode == 'minimal':
+            # execute(f'arch-chroot /mnt python /root/ego.py --sysconfig minimal')
+        # elif self.mode == 'niceguy':
+            # execute(f'arch-chroot /mnt python /root/ego.py --sysconfig niceguy')
+        # elif self.mode == 'beast':
+            # execute(f'arch-chroot /mnt python /root/ego.py --sysconfig beast')
+
+        
+        sysutils.execute(f'arch-chroot /mnt pip install git+https://github.com/alterEGOlinux/alterEGOtools.git')
+        alterEGO_installer = '/lib/python3.9/site-packages/alterEGOtools/installer.py'
         if self.mode == 'minimal':
-            execute(f'arch-chroot /mnt python /root/ego.py --sysconfig minimal')
+            execute(f'arch-chroot /mnt python {alterEGO_installer} --sysconfig minimal')
         elif self.mode == 'niceguy':
-            execute(f'arch-chroot /mnt python /root/ego.py --sysconfig niceguy')
+            execute(f'arch-chroot /mnt python {alterEGO_installer} --sysconfig niceguy')
         elif self.mode == 'beast':
-            execute(f'arch-chroot /mnt python /root/ego.py --sysconfig beast')
+            execute(f'arch-chroot /mnt python {alterEGO_installer} --sysconfig beast')
 
     def pull_git(self):
 
