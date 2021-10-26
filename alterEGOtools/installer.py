@@ -4,7 +4,7 @@
 ##                                                                           ##
 ## ego.py                                                                    ##
 ##   created        : 2021-06-05 00:03:38 UTC                                ##
-##   updated        : 2021-10-25 10:24:25 UTC                                ##
+##   updated        : 2021-10-26 14:13:47 UTC                                ##
 ##   description    : Install alterEGO Linux.                                ##
 ## _________________________________________________________________________ ##
 
@@ -203,20 +203,6 @@ def copy_recursive(src, dst):
                 os.remove(dst_file)
             shutil.copy2(src_file, dst_file)
 
-def execute(cmd, cwd=None, shell=False, text=True, input=None):
-
-    if shell == True:
-        cmd_list = cmd
-    else:
-        cmd_list = shlex.split(cmd)
-    if input:
-        input = input.encode()
-        
-    cmd_run = subprocess.run(cmd_list, cwd=cwd, shell=shell, input=input)
-
-    CommandResults = namedtuple('CommandResults', ['returncode'])
-    return CommandResults(cmd_run.returncode)
-
 class Msg:
 
     def color(color='white'):
@@ -371,16 +357,16 @@ class Installer:
                     /dev/sda1 : start=        2048, type=83, bootable
                     '''
 
-        execute(f"sfdisk /dev/sda", input=partition)
+        sysutils.execute(f"sfdisk /dev/sda", input=partition)
 
         ## [ FORMAT FILE SYSTEM ]
         Msg.console(f"{_green}[*]{_RESET} {_bold}Formating the file system...", wait=5)
-        execute(f"mkfs.ext4 /dev/sda1")
+        sysutils.execute(f"mkfs.ext4 /dev/sda1")
 
     def mount(self):
         ## [ MOUNT /dev/sda1 TO /mnt ]
         Msg.console(f"{_green}[*]{_RESET} {_bold}Mounting /dev/sda1 to /mnt...", wait=5)
-        execute(f"mount /dev/sda1 /mnt")
+        sysutils.execute(f"mount /dev/sda1 /mnt")
 
         ## [ CREATE ${HOME} ]
         Msg.console(f"{_green}[*]{_RESET} {_bold}Creating /home...", wait=5)
@@ -402,15 +388,15 @@ class Installer:
 
     def pacstrap(self):
 
-        execute(f"rm -rf /var/lib/pacman/sync")
-        execute(f"curl -o /etc/pacman.d/mirrorlist 'https://archlinux.org/mirrorlist/?country=US&protocol=http&protocol=https&ip_version=4'")
-        execute(f"sed -i -e 's/\#Server/Server/g' /etc/pacman.d/mirrorlist")
-        execute(f"pacman -Syy --noconfirm archlinux-keyring")
+        sysutils.execute(f"rm -rf /var/lib/pacman/sync")
+        sysutils.execute(f"curl -o /etc/pacman.d/mirrorlist 'https://archlinux.org/mirrorlist/?country=US&protocol=http&protocol=https&ip_version=4'")
+        sysutils.execute(f"sed -i -e 's/\#Server/Server/g' /etc/pacman.d/mirrorlist")
+        sysutils.execute(f"pacman -Syy --noconfirm archlinux-keyring")
 
         Msg.console(f"{_green}[*]{_RESET} {_bold}Starting pacstrap...", wait=5)
         pkgs_list = ' '.join(packages('pacstrap', self.mode))
         Msg.console(f"{_blue}[-]{_RESET} {_bold}Will install:\n{pkgs_list}", wait=5)
-        run_pacstrap = execute(f"pacstrap /mnt {pkgs_list}")
+        run_pacstrap = sysutils.execute(f"pacstrap /mnt {pkgs_list}")
         Msg.console(f"{_blue}[-]{_RESET} {_bold}Pacstrap exit code: {run_pacstrap.returncode}", wait=5)
 
         return run_pacstrap.returncode
@@ -418,7 +404,7 @@ class Installer:
 
     def fstab(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Generating the fstab...", wait=5)
-        execute(f"genfstab -U /mnt >> /mnt/etc/fstab", shell=True)
+        sysutils.execute(f"genfstab -U /mnt >> /mnt/etc/fstab", shell=True)
 
     def chroot(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Preparing arch-root...", wait=2)
@@ -432,14 +418,13 @@ class Installer:
         # elif self.mode == 'beast':
             # execute(f'arch-chroot /mnt python /root/ego.py --sysconfig beast')
 
-        
         sysutils.execute(f'arch-chroot /mnt pip install git+https://github.com/alterEGOlinux/alterEGOtools.git')
         if self.mode == 'minimal':
-            execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig minimal')
+            sysutils.execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig minimal')
         elif self.mode == 'niceguy':
-            execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig niceguy')
+            sysutils.execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig niceguy')
         elif self.mode == 'beast':
-            execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig beast')
+            sysutils.execute(f'arch-chroot /mnt python -m alterEGOtools.installer --sysconfig beast')
 
     def pull_git(self):
 
@@ -449,25 +434,25 @@ class Installer:
             if self.mode in g.mode:
                 Msg.console(f"{_blue}[-]{_RESET} {_bold}Pulling {g.remote}.", wait=5)
                 if not os.path.isdir(g.local):
-                    execute(f"git clone {g.remote} {g.local}")
+                    sysutils.execute(f"git clone {g.remote} {g.local}")
                 else:
-                    execute(f"git -C {g.local} pull")
+                    sysutils.execute(f"git -C {g.local} pull")
 
     def set_time(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Setting clock and timezone...", wait=5)
 
         os.symlink(f'/usr/share/zoneinfo/{timezone}', '/etc/localtime')
-        execute(f'timedatectl set-ntp true')
-        execute(f'hwclock --systohc --utc')
+        sysutils.execute(f'timedatectl set-ntp true')
+        sysutils.execute(f'hwclock --systohc --utc')
 
     def set_locale(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Generating locale...", wait=5)
 
-        execute(f'sed -i "s/#en_US.UTF-8/en_US.UTF-8/" /etc/locale.gen')
+        sysutils.execute(f'sed -i "s/#en_US.UTF-8/en_US.UTF-8/" /etc/locale.gen')
         with open('/etc/locale.conf', 'w') as locale_conf:
             locale_conf.write('LANG=en_US.UTF-8')
         os.putenv('LANG', 'en_US.UTF-8')
-        execute(f'locale-gen')
+        sysutils.execute(f'locale-gen')
 
     def set_network(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Setting up network...", wait=5)
@@ -482,7 +467,7 @@ class Installer:
                             ''')
 
         Msg.console(f"{_blue}[-]{_RESET} {_bold}Enabling NetworkManager daemon...", wait=5)
-        execute(f'systemctl enable NetworkManager.service')
+        sysutils.execute(f'systemctl enable NetworkManager.service')
 
     def skel(self):
         if self.mode == 'beast' or self.mode == 'niceguy':
@@ -494,16 +479,16 @@ class Installer:
     def users(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Configuring users and passwords...", wait=5)
         Msg.console(f"{_blue}[-]{_RESET} {_bold}Setting password for root user.", wait=5)
-        execute(f"passwd", input=f'{root_passwd}\n{root_passwd}\n')
+        sysutils.execute(f"passwd", input=f'{root_passwd}\n{root_passwd}\n')
 
         if self.mode == 'beast' or self.mode == 'niceguy':
             Msg.console(f"{_blue}[-]{_RESET} {_bold}Creating user {user}", wait=5)
-            execute(f"useradd -m -g users -G wheel,docker {user}") 
+            sysutils.execute(f"useradd -m -g users -G wheel,docker {user}") 
             Msg.console(f"{_blue}[-]{_RESET} {_bold}Setting password for {user}", wait=5)
-            execute(f"passwd {user}", input=f"{user_passwd}\n{user_passwd}\n")
+            sysutils.execute(f"passwd {user}", input=f"{user_passwd}\n{user_passwd}\n")
 
             Msg.console(f"{_blue}[-]{_RESET} {_bold}Enabling sudoers for {user}", wait=5)
-            execute(f'sed -i "s/# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/" /etc/sudoers')
+            sysutils.execute(f'sed -i "s/# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/" /etc/sudoers')
 
     def shared_resources(self):
         if self.mode == 'beast':
@@ -520,10 +505,10 @@ class Installer:
     def swapfile(self):
         Msg.console(f"{_green}Creating a 1G swapfile...", wait=5)
 
-        execute(f"fallocate -l 1G /swapfile")
+        sysutils.execute(f"fallocate -l 1G /swapfile")
         os.chmod('/swapfile', 0o600)
-        execute(f"mkswap /swapfile")
-        execute(f"swapon /swapfile")
+        sysutils.execute(f"mkswap /swapfile")
+        sysutils.execute(f"swapon /swapfile")
 
         with open('/etc/fstab', 'a') as swap_file:
             swap_file.write("/swapfile none swap defaults 0 0")
@@ -531,18 +516,18 @@ class Installer:
     def aur(self):
         if self.mode == 'niceguy' or self.mode == 'beast':
             Msg.console(f"{_green}[*]{_RESET} {_bold}Installing YAY...", wait=5)
-            execute(f"git clone https://aur.archlinux.org/yay.git", cwd='/opt')
-            execute(f"chown -R {user}:users /opt/yay")
-            execute(f"su {user} -c 'makepkg -si --needed --noconfirm'", cwd='/opt/yay')
+            sysutils.execute(f"git clone https://aur.archlinux.org/yay.git", cwd='/opt')
+            sysutils.execute(f"chown -R {user}:users /opt/yay")
+            sysutils.execute(f"su {user} -c 'makepkg -si --needed --noconfirm'", cwd='/opt/yay')
 
             Msg.console(f"{_green}[*]{_RESET} {_bold}Installing AUR packages...", wait=5)
             pkgs_list = ' '.join(packages('yay', mode=self.mode))
             Msg.console(f"{_blue}[-]{_RESET} {_bold}Will be installed:\n{pkgs_list}", wait=5)
-            execute(f"sudo -u {user} /bin/bash -c 'yay -S --noconfirm {pkgs_list}'")
+            sysutils.execute(f"sudo -u {user} /bin/bash -c 'yay -S --noconfirm {pkgs_list}'")
 
     def mandb(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Generating mandb...", wait=5)
-        execute(f"mandb")
+        sysutils.execute(f"mandb")
 
     def set_java(self):
         #### Burpsuite not running with java 16.
@@ -551,18 +536,18 @@ class Installer:
 
         if self.mode == 'beast':
             Msg.console(f"{_green}[*]{_RESET} {_bold}Fixing Java...", wait=5)
-            execute(f"archlinux-java set java-11-openjdk")
+            sysutils.execute(f"archlinux-java set java-11-openjdk")
 
     def bootloader(self):
         Msg.console(f"{_green}[*]{_RESET} {_bold}Installing and configuring the bootloader...", wait=5)
-        execute(f'grub-install /dev/sda')
-        execute(f'grub-mkconfig -o /boot/grub/grub.cfg')
+        sysutils.execute(f'grub-install /dev/sda')
+        sysutils.execute(f'grub-mkconfig -o /boot/grub/grub.cfg')
 
     def vbox_services(self):
         if self.mode == 'beast' or self.mode == 'niceguy':
             Msg.console(f"{_green}[*]{_RESET} {_bold}Starting vbox service...", wait=5)
-            execute(f'systemctl start vboxservice.service')
-            execute(f'systemctl enable vboxservice.service')
+            sysutils.execute(f'systemctl start vboxservice.service')
+            sysutils.execute(f'systemctl enable vboxservice.service')
 
 
 class HackerLab:
@@ -612,10 +597,10 @@ def main():
         if all_done.lower() in ['y', 'yes']:
             Msg.console(f"{_blue}[-]{_RESET} {_bold}Good Bye!", wait=1)
             try:
-                execute(f'umount -R /mnt')
-                execute(f'shutdown now') 
+                sysutils.execute(f'umount -R /mnt')
+                sysutils.execute(f'shutdown now') 
             except:
-                execute(f'shutdown now') 
+                sysutils.execute(f'shutdown now') 
         else:
             Msg.console(f"{_blue}[-]{_RESET} {_bold}Do a manual shutdown when ready.", wait=1)
 

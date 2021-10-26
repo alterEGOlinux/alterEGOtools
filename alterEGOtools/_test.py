@@ -18,7 +18,7 @@ arg_parser.add_argument('--install', help='mode')
 args = arg_parser.parse_args()
 
 if args.install:
-    sysutils.execute(f"bash ~/repositories/alterEGOlinux/alterEGOtools/test/count_to_100.bash", shell=True)
+    sysutils.execute(f"sudo pacman -Syu | tee -a ~/tmp/testpy.log", shell=True)
 else:
     sys.exit()
 
