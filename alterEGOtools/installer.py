@@ -4,7 +4,7 @@
 ##                                                                           ##
 ## ego.py                                                                    ##
 ##   created        : 2021-06-05 00:03:38 UTC                                ##
-##   updated        : 2021-10-26 14:13:47 UTC                                ##
+##   updated        : 2021-10-27 10:34:09 UTC                                ##
 ##   description    : Install alterEGO Linux.                                ##
 ## _________________________________________________________________________ ##
 
@@ -19,7 +19,6 @@ import shutil
 import subprocess
 import sys
 import threading
-import time
 
 from . import msg
 from . import sysutils
@@ -115,7 +114,7 @@ pkgs = {
         'pv':                       'nice',
         'python-beautifulsoup4':    'hack',
         'python-pandas':            'hack',
-        'python-pip':               'nice',
+        'python-pip':               'minimal',
         'python-pyaml':             'hack',
         'python-rich':              'hack',
         'qrencode':                 'hack',
