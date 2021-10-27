@@ -4,9 +4,11 @@
 ##                                                                           ##
 ## alterEGOtools/msg.py                                                      ##
 ##   created        : 2021-10-26 22:53:54 UTC                                ##
-##   updated        : 2021-10-26 22:54:05 UTC                                ##
+##   updated        : 2021-10-27 10:13:28 UTC                                ##
 ##   description    : Set of system utilities                                ##
 ## _________________________________________________________________________ ##
+
+import time
 
 class Msg:
 
