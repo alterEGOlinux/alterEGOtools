@@ -126,7 +126,6 @@ pkgs = {
         'rustscan':                 'aur-hack',
         'screen':                   'nice',
         'screenkey':                'nice',
-        #'sddm':                     'nice',
         'shellcheck':               'nice',
         'simple-mtpfs':             'aur-nice',
         'sqlitebrowser':            'hack',
@@ -354,15 +353,6 @@ class Installer:
 
     def chroot(self):
         msg.Msg.console(f"{foreground_green}[*]{format_reset} {format_bold}Preparing arch-root...", wait=0)
-        # shutil.copy('/root/ego.py', '/mnt/root/ego.py')
-
-        #### Moves to chroot to configure the new system.
-        # if self.mode == 'minimal':
-            # execute(f'arch-chroot /mnt python /root/ego.py --sysconfig minimal')
-        # elif self.mode == 'niceguy':
-            # execute(f'arch-chroot /mnt python /root/ego.py --sysconfig niceguy')
-        # elif self.mode == 'beast':
-            # execute(f'arch-chroot /mnt python /root/ego.py --sysconfig beast')
 
         sysutils.execute(f'arch-chroot /mnt pip install git+https://github.com/alterEGOlinux/alterEGOtools.git')
         if self.mode == 'minimal':
@@ -514,7 +504,7 @@ def main():
 
     args = parser.parse_args()
 
-    ## { PARTITION SET UP }____________________________________________________
+    ## [ SYSTEM PREP ] ----------------------------------------------------- ##
 
     if args.install:
         mode = args.install
@@ -522,10 +512,17 @@ def main():
 
         installer = Installer(mode)
 
+        ## ( PARTITION )
         installer.partition()
+
+        ## ( MOUNTING PARTITION )
         installer.mount()
+
+        ## ( PACMAN CONF )
+        #### Modifies /etc/pacman.conf
         installer.mod_pacman_conf()
 
+        ## ( PACSTRAP )
         #### Temporary solution due to few failure.
         run_pacstrap = installer.pacstrap()
         while run_pacstrap != 0:
@@ -533,12 +530,15 @@ def main():
                 run_pacstrap = installer.pacstrap()
             else:
                 break
+
+        ## ( FSTAB )
         installer.fstab()
+
+        ## ( ARCH-CHROOT )
         installer.chroot()
 
-        # [ ALL DONE ]
-
-        #### Returns from chroot.
+        ## ( ALL DONE )
+        #### Returning from chroot.
         all_done = input(f"{foreground_green}[*]{format_reset} {format_bold}Shutdown [Y/n]? ")
         if all_done.lower() in ['y', 'yes']:
             msg.Msg.console(f"{foreground_blue}[-]{format_reset} {format_bold}Good Bye!", wait=0)
@@ -550,84 +550,49 @@ def main():
         else:
             msg.Msg.console(f"{foreground_blue}[-]{format_reset} {format_bold}Do a manual shutdown when ready.", wait=0)
 
-    ## { SYSTEM CONFIGURATION }________________________________________________
+    ## [ SYSTEM CONFIGURATION ] -------------------------------------------- ##
 
     if args.sysconfig:
         mode = args.sysconfig
         installer = Installer(mode)
 
-        # [ PACMAN ]
-
-        ### Enabling ParallelDownloads in pacman.conf
-        # pacman_conf = '/etc/pacman.conf'
-        # pacman_conf_bkp = pacman_conf + '.bkp'
-        # shutil.move(pacman_conf, pacman_conf_bkp)
-        # with open(pacman_conf_bkp, 'r') as fin:
-            # with open(pacman_conf, 'w') as fout:
-                # for line in fin.readlines():
-                    # if "#ParallelDownloads = 5" in line:
-                        # fout.write(line.replace("#ParallelDownloads = 5", "ParallelDownloads = 8"))
-                    # else:
-                        # fout.write(line)
-        # os.remove(pacman_conf_bkp)
-
-        # def pacman(mode):
-
-            # pkgs_list = ' '.join(packages('pacman', mode))
-
-            ### Re-install archlinux-keyring in case of corruption.
-            # execute(f"pacman -S --noconfirm archlinux-keyring")
-            # execute(f"pacman -Syy")
-
-            # msg.Msg.console(f"{foreground_green}[*]{format_reset} {format_bold}Starting pacman...", wait=0)
-            # msg.Msg.console(f"{foreground_blue}[-]{format_reset} {format_bold}Will install:\n{pkgs_list}", wait=0)
-            # run_pacman = execute(f"pacman -Syu --noconfirm --needed {pkgs_list}")
-            # msg.Msg.console(f"{foreground_blue}[-]{format_reset} {format_bold}Pacman exit code: {run_pacman.returncode}", wait=0)
-
-        # pacman(mode)
-
-        ### Temporary solution due to few failure.
-        # while True:
-            # if input(f"{foreground_green}[*]{format_reset} {format_bold}Re-run pacman [Y/n]? {format_reset}").lower() in ['y', 'yes']:
-                # pacman(mode)
-            # else:
-                # break
-
-        ## [ GIT REPOSITORIES ]
+        ## ( GIT REPOSITORIES )
         installer.pull_git()
-        ## [ TIMEZONE & CLOCK ]
+
+        ## ( TIMEZONE & CLOCK )
         installer.set_time()
-        ## [ LOCALE ]
+
+        ## ( LOCALE )
         installer.set_locale()
-        ## [ NETWORK CONFIGURATION ]
+
+        ## ( NETWORK CONFIGURATION )
         installer.set_network()
-        ## [ POPULATING /etc/skel ]
+
+        ## ( POPULATING /etc/skel )
         installer.skel()
-        ## [ USERS and PASSWORDS ]
+
+        ## ( USERS and PASSWORDS )
         installer.users()
-        ## [ SHARED RESOURCES ]
+
+        ## ( SHARED RESOURCES )
         installer.shared_resources()
-        ## [ SWAPFILE ]
+
+        ## ( SWAPFILE )
         installer.swapfile()
-        ## [ YAY ]
+
+        ## ( AUR )
         installer.aur()
 
-        ## [ SDDM ]
-
-        #### Disabled for now. Still prefer to login in the traditional way.
-        # if mode == 'beast':
-            # msg.Msg.console(f"{foreground_green}[*]{format_reset} {format_bold}Deploying sddm and starting the service...", wait=0)
-            # shutil.copy(os.path.join(localEGO, 'global', 'etc', 'sddm.conf'), '/etc/sddm.conf')
-            # copy_recursive(os.path.join(localEGO, 'global', 'usr', 'share', 'sddm'), '/usr/share/sddm')
-            # execute(f'systemctl enable sddm.service')
-
-        ## [ GENERATING mandb ]
+        ## ( GENERATING mandb )
         installer.mandb()
-        ## [ SETTING JAVA DEFAULT ]
+
+        ## ( SETTING JAVA DEFAULT )
         installer.set_java()
-        ## [ BOOTLOADER ]
+
+        ## ( BOOTLOADER )
         installer.bootloader()
-        ## [ VIRTUALBOX SERVICES ]
+
+        ## ( VIRTUALBOX SERVICES )
         installer.vbox_services()
 
     ## { TESTING }_____________________________________________________________
