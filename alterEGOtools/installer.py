@@ -2,9 +2,9 @@
 
 ## { alterEGO Linux: "Open the vault of knowledge" } ----------------------- ##
 ##                                                                           ##
-## ego.py                                                                    ##
+## alterEGOtools/installer.py                                                ##
 ##   created        : 2021-06-05 00:03:38 UTC                                ##
-##   updated        : 2021-10-27 10:34:09 UTC                                ##
+##   updated        : 2021-10-27 11:38:00 UTC                                ##
 ##   description    : Install alterEGO Linux.                                ##
 ## _________________________________________________________________________ ##
 
@@ -57,7 +57,8 @@ pkgs = {
         'dirbuster':                'aur-hack',
         'docker':                   'hack',
         'dos2unix':                 'minimal',
-        'dunst':                    'nice',
+        'dunst':                    'minimal',
+        'easy-rsa':                 'beast',
         'entr':                     'nice',
         'exfat-utils':              'nice',
         'feh':                      'nice',
@@ -100,7 +101,7 @@ pkgs = {
         'nmap':                     'nice',
         'ntfs-3g':                  'nice',
         'openssh':                  'minimal',
-        'openvpn':                  'minimal',
+        'openvpn':                  'beast',
         'p7zip':                    'minimal',
         'pandoc-bin':               'aur-nice',
         'pavucontrol':              'nice',
@@ -130,7 +131,7 @@ pkgs = {
         'simple-mtpfs':             'aur-nice',
         'sqlitebrowser':            'hack',
         'sxiv':                     'nice',
-        'tcpdump':                  'hack',
+        'tcpdump':                  'beast',
         'tesseract':                'hack',
         'tesseract-data-eng':       'hack',
         'tesseract-data-fra':       'hack',
@@ -284,7 +285,7 @@ def shared_wordlists():
         dst = os.path.join('/usr/local/share/wordlists', f)
         os.symlink(src, dst)
 
-## { INSTALLER }_______________________________________________________________
+## [ CLASS: Installer ] ---------------------------------------------------- ##
 
 class Installer:
 
