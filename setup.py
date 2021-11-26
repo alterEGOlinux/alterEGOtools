@@ -19,6 +19,6 @@ setup(name='alterEGOtools',
       url='#',
       packages=['alterEGOtools'],
       package_dir={'alterEGOtools':'alterEGOtools'},
-      package_data={['scripts/*', 'tests/*']}
+      package_data={'alterEGOtools': ['README.md', 'scripts/*', 'tests/*']}
      )
 
