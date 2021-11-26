@@ -18,5 +18,7 @@ setup(name='alterEGOtools',
       author_email='pascal.malouin@gmail.com',
       url='#',
       packages=['alterEGOtools'],
+      package_dir={'alterEGOtools':'alterEGOtools'},
+      package_data={['scripts/*', 'tests/*']}
      )
 
