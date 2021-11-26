@@ -12,7 +12,7 @@
 from distutils.core import setup
 
 setup(name='alterEGOtools',
-      version='0.0.2',
+      version='0.0.3',
       description='Tools to build alterEGO Linux',
       author='Pascal Malouin (fantomH)',
       author_email='pascal.malouin@gmail.com',
