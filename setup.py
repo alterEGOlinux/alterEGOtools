@@ -12,13 +12,11 @@
 from distutils.core import setup
 
 setup(name='alterEGOtools',
-      version='0.0.3',
+      version='0.0.4',
       description='Tools to build alterEGO Linux',
       author='Pascal Malouin (fantomH)',
       author_email='pascal.malouin@gmail.com',
       url='#',
-      packages=['alterEGOtools'],
-      package_dir={'alterEGOtools':'alterEGOtools'},
-      package_data={'alterEGOtools': ['README.md', 'scripts/*', 'tests/*']}
+      packages=['alterEGOtools', 'alterEGOtools.lib', 'alterEGOtools.scripts'],
      )
 
